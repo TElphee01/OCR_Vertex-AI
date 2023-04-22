@@ -74,6 +74,17 @@ gsutil notification create -t imageFeed -f json gs://screenshots_storage
 
 Enable Firestore in Native Mode
 
+Create GitHub secrets for WIF_PROVIDER and WIF_SERVICE_ACCOUNT
+
+Workload Identity Provider
+```
+projects/487320900158/locations/global/workloadIdentityPools/service-pool/providers/service-identity-provider
+```
+
+Service Account
+```
+github-service-account@funtalkr.iam.gserviceaccount.com
+```
 
 # Cloud Run Image Processing Sample
 
