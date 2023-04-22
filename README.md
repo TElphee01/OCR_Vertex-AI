@@ -1,3 +1,80 @@
+
+Install cloud cli
+
+Initialize
+
+Enable CloudRun
+
+Configure GCloud
+```
+gcloud config set project psiparch
+gcloud config set run/region us-east4
+```
+
+Add Topic to PubSub
+```
+gcloud pubs topics create imageFeed
+```
+
+Build Project
+```
+gcloud builds submit --tag gcr.io/psiparch/pubsub
+```
+
+Deploy Functions
+```
+gcloud run deploy psiparch-function --image gcr.io/psiparch/pubsub
+gcloud run deploy psiparch-function --image gcr.io/psiparch/pubsub --no-allow-unauthenticated
+```
+
+Function Address
+https://psiparch-function-ro5cujvoja-uk.a.run.app
+
+Create Storage Bucket
+```
+gsutil mb gs://screenshots
+```
+
+Create Service Account for PubSub
+```
+gcloud iam service-accounts create cloud-run-pubsub-invoker --display-name "Cloud Run Pub/Sub Invoker"
+```
+
+Create Subscription and assign permission to invoke service
+```
+gcloud run services add-iam-policy-binding psiparch-function \
+--member=serviceAccount:cloud-run-pubsub-invoker@psiparch.iam.gserviceaccount.com \
+--role=roles/run.invoker
+```
+
+Allow PubSub to create auth tokens
+```
+gcloud projects add-iam-policy-binding psiparch \
+   --member=serviceAccount:service-223554570259@gcp-sa-pubsub.iam.gserviceaccount.com \
+   --role=roles/iam.serviceAccountTokenCreator
+```
+
+Create PubSub Subscription
+```
+gcloud pubsub subscriptions create myRunSubscription --topic imageFeed \
+--ack-deadline=600 \
+--push-endpoint=https://psiparch-function-ro5cujvoja-uk.a.run.app/ \
+--push-auth-service-account=cloud-run-pubsub-invoker@psiparch.iam.gserviceaccount.com
+```
+
+Create Service Account
+```
+gsutil kms serviceaccount -p psiparch
+```
+
+Turn on Storage Notifications
+```
+gsutil notification create -t imageFeed -f json gs://screenshots_storage
+```
+
+Enable Firestore in Native Mode
+
+
 # Cloud Run Image Processing Sample
 
 This sample service applies [Cloud Storage](https://cloud.google.com/storage/docs)-triggered image processing with [Cloud Vision API](https://cloud.google.com/vision/docs) analysis and ImageMagick transformation.
