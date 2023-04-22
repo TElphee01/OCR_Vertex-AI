@@ -4,73 +4,80 @@ Install cloud cli
 Initialize
 
 Enable CloudRun
+```
+gcloud init
+(If account exists, select 1. Then select existing project)
+```
 
 Configure GCloud
 ```
-gcloud config set project psiparch
+gcloud config set project funtalkr
 gcloud config set run/region us-east4
 ```
 
 Add Topic to PubSub
 ```
-gcloud pubs topics create imageFeed
+gcloud pubsub topics create ocrTopic
 ```
 
 Build Project
 ```
-gcloud builds submit --tag gcr.io/psiparch/pubsub
+gcloud builds submit --tag gcr.io/funtalkr/pubsub
 ```
 
 Deploy Functions
 ```
-gcloud run deploy psiparch-function --image gcr.io/psiparch/pubsub
-gcloud run deploy psiparch-function --image gcr.io/psiparch/pubsub --no-allow-unauthenticated
+gcloud run deploy ocr-service --image gcr.io/funtalkr/pubsub
 ```
 
 Function Address
-https://psiparch-function-ro5cujvoja-uk.a.run.app
+https://ocr-service-dycqqwdmza-uk.a.run.app
+
 
 Create Storage Bucket
 ```
-gsutil mb gs://screenshots
+gsutil mb gs://incoming-screenshots
 ```
 
 Create Service Account for PubSub
 ```
-gcloud iam service-accounts create cloud-run-pubsub-invoker --display-name "Cloud Run Pub/Sub Invoker"
+gcloud iam service-accounts create ocr-service-pubsub-invoker --display-name "OCR Service Pub/Sub Invoker"
 ```
 
 Create Subscription and assign permission to invoke service
 ```
-gcloud run services add-iam-policy-binding psiparch-function \
---member=serviceAccount:cloud-run-pubsub-invoker@psiparch.iam.gserviceaccount.com \
---role=roles/run.invoker
+gcloud run services add-iam-policy-binding ocr-service --member=serviceAccount:ocr-service-pubsub-invoker@funtalkr.iam.gserviceaccount.com --role=roles/run.invoker
 ```
 
 Allow PubSub to create auth tokens
 ```
-gcloud projects add-iam-policy-binding psiparch \
-   --member=serviceAccount:service-223554570259@gcp-sa-pubsub.iam.gserviceaccount.com \
-   --role=roles/iam.serviceAccountTokenCreator
+gcloud projects add-iam-policy-binding funtalkr --member=serviceAccount:service-487320900158@gcp-sa-pubsub.iam.gserviceaccount.com --role=roles/iam.serviceAccountTokenCreator
 ```
 
 Create PubSub Subscription
 ```
-gcloud pubsub subscriptions create myRunSubscription --topic imageFeed \
---ack-deadline=600 \
---push-endpoint=https://psiparch-function-ro5cujvoja-uk.a.run.app/ \
---push-auth-service-account=cloud-run-pubsub-invoker@psiparch.iam.gserviceaccount.com
+gcloud pubsub subscriptions create ocrSubscription --topic ocrTopic --ack-deadline=600 --push-endpoint=https://ocr-service-dycqqwdmza-uk.a.run.app/ --push-auth-service-account=ocr-service-pubsub-invoker@funtalkr.iam.gserviceaccount.com
 ```
 
 Create Service Account
 ```
-gsutil kms serviceaccount -p psiparch
+gsutil kms serviceaccount -p funtalkr
 ```
 
 Turn on Storage Notifications
 ```
-gsutil notification create -t imageFeed -f json gs://screenshots_storage
+gsutil notification create -t ocrTopic -f json gs://incoming-screenshots
 ```
+
+
+
+Test image upload
+```
+gsutil cp <image file> gs://incoming-screenshots
+```
+gsutil cp C:\Users\telph\OneDrive\Desktop\testImages\snip.png gs://incoming-screenshots
+```
+
 
 Enable Firestore in Native Mode
 
