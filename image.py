@@ -57,7 +57,6 @@ def detect_text(image, file_name):
 
     response = client.text_detection(image=image)
     texts = response.text_annotations
-    print('Texts:')
 
     # for text in texts:
     #     print('\n"{}"'.format(text.description))
@@ -73,12 +72,13 @@ def detect_text(image, file_name):
             'https://cloud.google.com/apis/design/errors'.format(
                 response.error.message))
     try:
-        from pprint import pprint
-        pprint(response)
-        # doc_ref.set({
-        #     response: json.dumps(response)})
+        doc_ref.set({
+            'text_annotations': texts
+        })
+
     except Exception as e:
         return ('', 500)
+
     return response
 
 # [END run_imageproc_handler_detect]
