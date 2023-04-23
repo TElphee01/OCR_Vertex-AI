@@ -39,7 +39,7 @@ def process_images(data):
     blob_source = vision.Image(source=vision.ImageSource(image_uri=blob_uri))
 
     print(f"Analyzing {file_name}.")
-    detect_text(blob_source)
+    detect_text(blob_source, file_name)
 
 
 # [END run_imageproc_handler_analyze]
@@ -48,15 +48,10 @@ def process_images(data):
 
 # [START cloudrun_imageproc_handler_detect]
 # [START run_imageproc_handler_detect]
-def detect_text(image):
+def detect_text(image, file_name):
 
     db = firestore.Client(project='funtalkr')
-    doc_ref = db.collection(u'users').document(u'alovelace')
-    doc_ref.set({
-        u'first': u'Ada',
-        u'last': u'Lovelace',
-        u'born': 1815
-    })
+    doc_ref = db.collection(u'screenshot').document(file_name)
     client = vision.ImageAnnotatorClient()
 
     response = client.text_detection(image=image)
@@ -76,7 +71,7 @@ def detect_text(image):
             '{}\nFor more info on error messages, check: '
             'https://cloud.google.com/apis/design/errors'.format(
                 response.error.message))
-
+    doc_ref.set(response)
     return response
 
 # [END run_imageproc_handler_detect]
