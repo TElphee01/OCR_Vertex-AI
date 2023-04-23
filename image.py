@@ -73,8 +73,10 @@ def detect_text(image, file_name):
             'https://cloud.google.com/apis/design/errors'.format(
                 response.error.message))
     try:
-        doc_ref.set({
-            response: json.dumps(response)})
+        from pprint import pprint
+        pprint(response)
+        # doc_ref.set({
+        #     response: json.dumps(response)})
     except Exception as e:
         return ('', 500)
     return response
