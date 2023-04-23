@@ -19,6 +19,7 @@ import tempfile
 
 from google.cloud import storage, vision, firestore
 from wand.image import Image
+import json
 
 storage_client = storage.Client()
 vision_client = vision.ImageAnnotatorClient()
@@ -58,20 +59,21 @@ def detect_text(image, file_name):
     texts = response.text_annotations
     print('Texts:')
 
-    for text in texts:
-        print('\n"{}"'.format(text.description))
-
-        vertices = (['({},{})'.format(vertex.x, vertex.y)
-                    for vertex in text.bounding_poly.vertices])
-
-        print('bounds: {}'.format(','.join(vertices)))
+    # for text in texts:
+    #     print('\n"{}"'.format(text.description))
+    #
+    #     vertices = (['({},{})'.format(vertex.x, vertex.y)
+    #                 for vertex in text.bounding_poly.vertices])
+    #
+    #     print('bounds: {}'.format(','.join(vertices)))
 
     if response.error.message:
         raise Exception(
             '{}\nFor more info on error messages, check: '
             'https://cloud.google.com/apis/design/errors'.format(
                 response.error.message))
-    doc_ref.set(response)
+    doc_ref.set({
+        response: json.dumps(response)})
     return response
 
 # [END run_imageproc_handler_detect]
