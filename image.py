@@ -50,7 +50,13 @@ def process_images(data):
 # [START run_imageproc_handler_detect]
 def detect_text(image):
 
-    # ## db = firestore.Client(project='my-project-id')
+    db = firestore.Client(project='funtalkr')
+    doc_ref = db.collection(u'users').document(u'alovelace')
+    doc_ref.set({
+        u'first': u'Ada',
+        u'last': u'Lovelace',
+        u'born': 1815
+    })
     client = vision.ImageAnnotatorClient()
 
     response = client.text_detection(image=image)
