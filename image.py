@@ -72,8 +72,11 @@ def detect_text(image, file_name):
             '{}\nFor more info on error messages, check: '
             'https://cloud.google.com/apis/design/errors'.format(
                 response.error.message))
-    doc_ref.set({
-        response: json.dumps(response)})
+    try:
+        doc_ref.set({
+            response: json.dumps(response)})
+    except Exception as e:
+        return ('', 500)
     return response
 
 # [END run_imageproc_handler_detect]
