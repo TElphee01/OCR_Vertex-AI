@@ -71,13 +71,11 @@ def detect_text(image, file_name):
             '{}\nFor more info on error messages, check: '
             'https://cloud.google.com/apis/design/errors'.format(
                 response.error.message))
-    try:
-        doc_ref.set({
-            'text_annotations': texts
-        })
 
-    except Exception as e:
-        return ('', 500)
+    print("Set Document")
+    doc_ref.set({
+        'text_annotations': texts
+    })
 
     return response
 
