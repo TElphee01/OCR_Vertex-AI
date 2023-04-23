@@ -74,7 +74,7 @@ def detect_text(image, file_name):
 
     print("Set Document")
     doc_ref.set({
-        'text_annotations': texts
+        'text_annotations': f'{texts}'
     })
 
     return response
