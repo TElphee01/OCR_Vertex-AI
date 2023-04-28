@@ -37,6 +37,7 @@ def process_images(data):
 
     blob = storage_client.bucket(bucket_name).get_blob(file_name)
     blob_uri = f"gs://{bucket_name}/{file_name}"
+    print('Image URI: ' + blob_uri)
     blob_source = vision.Image(source=vision.ImageSource(image_uri=blob_uri))
 
     print(f"Analyzing {file_name}.")
@@ -52,7 +53,8 @@ def process_images(data):
 def detect_text(image, file_name):
 
     db = firestore.Client(project='funtalkr')
-    doc_ref = db.collection(u'screenshot').document(file_name)
+    path = file_name.rsplit('/', 1)
+    iid = path[1].split('.')[0]
     client = vision.ImageAnnotatorClient()
 
     response = client.text_detection(image=image)
@@ -73,7 +75,11 @@ def detect_text(image, file_name):
                 response.error.message))
 
     print("Set Document")
-    doc_ref.set({
+    print('path: ' + path[0] + u'/images')
+    print('iid: ' + iid)
+    ref = db.collection(path[0] + u'/images').document(iid)
+    print(ref.path)
+    ref.set({
         'text_annotations': f'{texts}'
     })
 
