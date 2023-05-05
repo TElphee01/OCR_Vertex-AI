@@ -4,7 +4,6 @@ import os
 from torch import multiprocessing
 import base64
 import json
-import tempfile
 from chat_ocr import decode_image
 from flask import Flask, request, Response
 from google.cloud import storage, firestore
@@ -74,17 +73,16 @@ def index():
             file_data = data
             file_name = file_data["name"]
             bucket_name = file_data["bucket"]
+            bucket = storage_client.get_bucket(bucket_name)
+            blob = bucket.blob(file_name)
 
             # blob = storage_client.bucket(bucket_name).get_blob(file_name)
             # blob_uri = f"gs://{bucket_name}/{file_name}"
 
-            bucket = storage_client.get_bucket(bucket_name)
-            blob = bucket.blob(file_name)
-
-            print("Saving to temp_local_filename")
-            _, temp_local_filename = tempfile.mkstemp()
-            blob.download_to_filename(temp_local_filename)
-            print("Sending blob to decode_image: " + str(blob))
+            # print("Saving to temp_local_filename")
+            # _, temp_local_filename = tempfile.mkstemp()
+            # blob.download_to_filename(temp_local_filename)
+            # print("Sending blob to decode_image: " + str(blob))
             decode_image(blob)
             return ("", 204)
 
