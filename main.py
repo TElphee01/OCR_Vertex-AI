@@ -1,17 +1,3 @@
-# Copyright 2019 Google, LLC.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 # [START cloudrun_imageproc_controller]
 # [START run_imageproc_controller]
 import os
@@ -19,12 +5,11 @@ from torch import multiprocessing
 import base64
 import json
 import tempfile
-
 from chat_ocr import decode_image
-
 from flask import Flask, request, Response
 from google.cloud import storage, firestore
 from google.oauth2 import service_account
+
 # Specify the path to the JSON key file in the container
 key_path = "credentials.json"
 
@@ -33,7 +18,6 @@ credentials = service_account.Credentials.from_service_account_file(key_path)
 
 # Instantiate a Google Cloud Storage client using the credentials
 storage_client = storage.Client(credentials=credentials)
-
 
 app = Flask(__name__)
 
@@ -85,6 +69,7 @@ def index():
             return f"Bad Request: {msg}", 400
 
         try:
+            print("Fetching image from Firestore")
             # Fetch image location from cloud storage
             file_data = data
             file_name = file_data["name"]
@@ -96,23 +81,10 @@ def index():
             bucket = storage_client.get_bucket(bucket_name)
             blob = bucket.blob(file_name)
 
-            print("Start of main")
-            print(data)
-            print(bucket_name)
-
-            print(bucket)
-            print(blob)
-            print(file_name)
+            print("Saving to temp_local_filename")
             _, temp_local_filename = tempfile.mkstemp()
-
-            print(temp_local_filename)
-
             blob.download_to_filename(temp_local_filename)
-            print(type(temp_local_filename))
-            print("TEST HERE2222")
-
-            print(type(blob))
-            print(temp_local_filename)
+            print("Sending blob to decode_image: " + str(blob))
             decode_image(blob)
             return ("", 204)
 
@@ -124,11 +96,7 @@ def index():
     # [END run_imageproc_controller]
     # [END cloudrun_imageproc_controller]
 
-
-print(__name__)
-
 if __name__ == "__main__":
-    print("IN main")
     multiprocessing.set_start_method("spawn", force=True)
     PORT = int(os.getenv("PORT")) if os.getenv("PORT") else 8080
 
