@@ -93,7 +93,7 @@ jobs:
           registry: '${{ env.GAR_LOCATION }}-docker.pkg.dev'
       - name: Get model file
         run: |-
-          gsutil cp gs://funtalkr/vertex-ocr/v1/chat_dtc.pt .
+          gsutil cp gs://funtalkr.appspot.com/vertex-ocr/v1/chat_dtc.pt .
       - name: Build and Push Container
         run: |-
           docker build -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/vertex-ocr:${{ github.sha }}" ./
