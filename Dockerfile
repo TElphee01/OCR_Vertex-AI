@@ -12,9 +12,9 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends tzdata && \
     ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime && \
     echo "America/New_York" > /etc/timezone && \
-    dpkg-reconfigure --frontend noninteractive tzdata \
-    software-properties-common -y \
-    libgl1-mesa-glx -y
+    dpkg-reconfigure --frontend noninteractive tzdata && \
+    software-properties-common && \
+    libgl1-mesa-glx
 
 ## Copy local code to the container image.
 ENV APP_HOME /app
