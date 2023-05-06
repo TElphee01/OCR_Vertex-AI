@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/paddlepaddle:22.08-py3
+FROM nvcr.io/nvidia/paddlepaddle:22.08-py3@sha256:376cbbc1a363c38be00b35af84171daf9b49b1756faadfba2a96ab1f961e6bf4
 
 COPY requirements.txt ./requirements.txt
 
