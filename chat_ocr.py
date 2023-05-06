@@ -8,7 +8,7 @@ from image_handler import convert_image
 
 cwd = os.getcwd()
 # load chat detection models and functions
-YOLO_chat_detection_model = YOLO(os.path.join(cwd, 'chat_dtc.pt'))  # load a custom model
+YOLO_chat_detection_model = YOLO('chat_dtc.pt')  # load a custom model
 PADDLE_text_detection_ocr = PaddleOCR(lang='en', use_angle_cls=False, use_gpu=True)
 
 
