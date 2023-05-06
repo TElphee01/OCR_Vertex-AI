@@ -50,7 +50,7 @@ def index():
 
         img_response = decode_image(blob)
         if img_response is not None:
-            return {"predictions": img_response}, 200
+            return img_response, 200
         else:
             raise Exception("No prediction response")
     except Exception as e:
