@@ -29,4 +29,4 @@ COPY . ./
 
 EXPOSE 5000
 
-CMD exec gunicorn --bind :5000 --workers 1 --threads 8 --timeout 0 --log-level debug main:app
+CMD exec gunicorn --bind 0.0.0.0:8080 --workers 1 --threads 8 --timeout 0 --log-level debug main:app
