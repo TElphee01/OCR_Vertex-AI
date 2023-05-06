@@ -1,9 +1,3 @@
-# [START cloudrun_imageproc_controller]
-# [START run_imageproc_controller]
-import os
-from torch import multiprocessing
-import base64
-import json
 from chat_ocr import decode_image
 from flask import Flask, request, Response
 from google.cloud import storage, firestore
@@ -24,80 +18,41 @@ app = Flask(__name__)
 @app.route("/isalive")
 def is_alive():
     print("/isalive request")
-    status_code = Response(status=200)
-    return status_code
+    return "", 200
 
 
 @app.route("/predict", methods=["POST"])
 def index():
-    envelope = request.get_json()
+    request_input = request.get_json()
     from pprint import pprint
-    pprint(envelope)
-    if not envelope:
+    pprint(request_input)
+    if not request_input:
         msg = "no Pub/Sub message received"
         print(f"error: {msg}")
         return f"Bad Request: {msg}", 400
 
-    if not isinstance(envelope, dict) or "message" not in envelope:
+    if "instances" not in request_input.keys() or "parameters" not in request_input.keys():
         msg = "invalid Pub/Sub message format"
         print(f"error: {msg}")
         return f"Bad Request: {msg}", 400
 
-    # Decode the Pub/Sub message.
-    pubsub_message = envelope["message"]
+    try:
+        print("Fetching image from Firestore")
+        # Parse incoming
+        instance = request_input["instances"][0]
+        user_id = request_input["parameters"]["user_id"]
+        talk_id = request_input["parameters"]["talk_id"]
 
-    if isinstance(pubsub_message, dict) and "data" in pubsub_message:
-        try:
-            data = json.loads(base64.b64decode(pubsub_message["data"]).decode())
+        # Fetch image location from cloud storage
+        bucket = storage_client.get_bucket("funtalkr.appspot.com")
+        blob = bucket.blob(f"users/{user_id}/talks/{talk_id}/{instance}")
+        # print("Bucket path: " + str(f"users/{user_id}/talks/{talk_id}/{instance}"))
 
-        except Exception as e:
-            msg = (
-                "Invalid Pub/Sub message: "
-                "data property is not valid base64 encoded JSON"
-            )
-            print(f"error: {e}")
-            return f"Bad Request: {msg}", 400
-
-        # Validate the message is a Cloud Storage event.
-        if not data["name"] or not data["bucket"]:
-            msg = (
-                "Invalid Cloud Storage notification: "
-                "expected name and bucket properties"
-            )
-            print(f"error: {msg}")
-            return f"Bad Request: {msg}", 400
-
-        try:
-            print("Fetching image from Firestore")
-            # Fetch image location from cloud storage
-            file_data = data
-            file_name = file_data["name"]
-            bucket_name = file_data["bucket"]
-            bucket = storage_client.get_bucket(bucket_name)
-            blob = bucket.blob(file_name)
-
-            # blob = storage_client.bucket(bucket_name).get_blob(file_name)
-            # blob_uri = f"gs://{bucket_name}/{file_name}"
-
-            # print("Saving to temp_local_filename")
-            # _, temp_local_filename = tempfile.mkstemp()
-            # blob.download_to_filename(temp_local_filename)
-            # print("Sending blob to decode_image: " + str(blob))
-            decode_image(blob)
-            return ("", 204)
-
-        except Exception as e:
-            print(f"error: {e}")
-            return ("", 500)
-
-    return ("", 500)
-    # [END run_imageproc_controller]
-    # [END cloudrun_imageproc_controller]
-
-if __name__ == "__main__":
-    multiprocessing.set_start_method("spawn", force=True)
-    PORT = int(os.getenv("PORT")) if os.getenv("PORT") else 8080
-
-    # This is used when running locally. Gunicorn is used to run the
-    # application on Cloud Run. See entrypoint in Dockerfile.
-    app.run(host="127.0.0.1", port=PORT, debug=True, threaded=False)
+        img_response = decode_image(blob)
+        if img_response is not None:
+            return {"predictions": img_response}, 200
+        else:
+            raise Exception("No prediction response")
+    except Exception as e:
+        print(f"error: {e}")
+        return "", 500
