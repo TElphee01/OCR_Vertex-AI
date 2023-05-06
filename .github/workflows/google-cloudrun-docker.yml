@@ -83,7 +83,7 @@ jobs:
         name: 'gcloud'
         run: |-
           gcloud config set pass_credentials_to_gsutil true
-          gcloud auth activate-service-account github-service-account@funtalkr.iam.gserviceaccount.com --key-file ${{ steps.auth.credentials_file_path }}
+          gcloud auth activate-service-account github-service-account@funtalkr.iam.gserviceaccount.com --key-file=${{ steps.auth.credentials_file_path }}
           gsutil cp gs://funtalkr.appspot.com/vertex-ocr/v1/chat_dtc.pt .
         
       # NOTE: Alternative option - authentication via credentials json
