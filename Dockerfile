@@ -27,6 +27,6 @@ ENV APP_HOME /app
 WORKDIR $APP_HOME
 COPY . ./
 
-EXPOSE 5000
+EXPOSE 8080
 
 CMD exec gunicorn --bind 0.0.0.0:8080 --workers 1 --threads 8 --timeout 0 --log-level debug main:app
