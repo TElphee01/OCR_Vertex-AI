@@ -1,5 +1,5 @@
 from chat_ocr import decode_image
-from flask import Flask, request, Response
+from flask import Flask, request, Response, jsonify
 from google.cloud import storage, firestore
 from google.oauth2 import service_account
 
@@ -50,7 +50,10 @@ def index():
 
         img_response = decode_image(blob)
         if img_response is not None:
-            return img_response, 200
+            # return img_response, 200
+            return jsonify({
+                "predictions": [img_response]
+            }), 200
         else:
             raise Exception("No prediction response")
     except Exception as e:
