@@ -39,9 +39,9 @@ def index():
     try:
         print("Fetching image from Firestore")
         # Parse incoming
-        instance = request_input["instances"][0]
-        user_id = request_input["parameters"]["user_id"]
-        talk_id = request_input["parameters"]["talk_id"]
+        instance = request_input["instances"][0]['FileName']
+        user_id = request_input["parameters"]["UserId"]
+        talk_id = request_input["parameters"]["TalkId"]
 
         # Fetch image location from cloud storage
         bucket = storage_client.get_bucket("funtalkr.appspot.com")
