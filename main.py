@@ -45,8 +45,8 @@ def index():
 
         # Fetch image location from cloud storage
         bucket = storage_client.get_bucket("funtalkr.appspot.com")
-        blob = bucket.blob(f"users/{user_id}/talks/{talk_id}/{instance}")
-        # print("Bucket path: " + str(f"users/{user_id}/talks/{talk_id}/{instance}"))
+        blob = bucket.blob(f"users/{user_id}/talks/{talk_id}/images/{instance}")
+        # print("Bucket path: " + str(f"users/{user_id}/talks/{talk_id}/images/{instance}"))
 
         img_response = decode_image(blob)
         if img_response is not None:
