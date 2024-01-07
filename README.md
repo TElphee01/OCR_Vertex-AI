@@ -1,4 +1,10 @@
+# Python based Paddle OCR image detection model deployed via Docker containers to Google Cloud on commit with Github CICD pipeline
+# Recieves image location from PubSub then publishes the result. Result then recieved by prompt selection module. 
 
+## Credentials removed for public repo release. Model is now maintained in another project. 
+
+
+### General instructions
 Install cloud cli
 
 Initialize
