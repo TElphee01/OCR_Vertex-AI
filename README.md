@@ -1,4 +1,4 @@
-## Python based Paddle OCR image detection model deployed via Docker containers to Google Cloud on commit with Github CICD pipeline
+## Python based Paddle OCR image detection model deployed via Docker containers to Google Cloud Vertex AI on commit with Github CICD pipeline
 ## Recieves image location from PubSub then publishes the result to prompt selection module. 
 
 ### Credentials removed for public repo release. Model is now maintained in another project. 
